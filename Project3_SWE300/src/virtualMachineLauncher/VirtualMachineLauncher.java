@@ -1,3 +1,5 @@
+package virtualMachineLauncher;
+
 import com.sun.jdi.Bootstrap;
 import com.sun.jdi.VirtualMachine;
 import com.sun.jdi.connect.Connector;
