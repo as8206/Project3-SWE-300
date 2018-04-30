@@ -22,7 +22,7 @@ import virtualMachineLauncher.VirtualMachineLauncher;
 
 
 
-public class TestClassRunner {
+public class TestClassRunner2 {
 
 	static ReferenceType ref;
 	static Field testStart;
@@ -43,7 +43,7 @@ public class TestClassRunner {
 		
 		
 		EventRequestManager mgr = vm.eventRequestManager();
-		MethodExitRequest exitRequest = mgr.createMethodExitRequest();
+		MethodEntryRequest exitRequest = mgr.createMethodEntryRequest();
 		exitRequest.addClassFilter("rangeClasses.MyJunit");
 		
 		
@@ -88,11 +88,8 @@ public class TestClassRunner {
 				}
 				if (variableModifcationFlag==true &&  e instanceof MethodExitEvent)
 				{
-					if (((MethodExitEvent)e).method().name().startsWith("test"))
-					{
-						process((MethodExitEvent) e);
-						variableModifcationFlag = false;
-					}
+					process((MethodExitEvent) e);
+					variableModifcationFlag = false;
 				}
 			}
 			set.resume();
@@ -100,12 +97,14 @@ public class TestClassRunner {
 	}
 
 	private static void process(MethodExitEvent e) throws InvalidTypeException, ClassNotLoadedException, IncompatibleThreadStateException{
-//		System.out.println("Exiting " + e.method());
 		ObjectReference obj = e.thread().frame(0).thisObject();
+		System.out.println(e);
 		IntegerValue startInt = vm.mirrorOf(100);
 		IntegerValue endInt = vm.mirrorOf(200);
 		obj.setValue(testStart, startInt);
 		obj.setValue(testEnd, endInt);
+//		System.out.println(obj.getValue(testStart));
+//		System.out.println(obj.getValue(testEnd));
 	}
 
 }
