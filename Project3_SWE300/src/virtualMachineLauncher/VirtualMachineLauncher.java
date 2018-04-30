@@ -47,6 +47,7 @@ public class VirtualMachineLauncher {
     private OutputStream outputStream = System.out;
     private OutputStream errorStream = System.err;
 
+    
     public VirtualMachineLauncher() {
         for (LaunchingConnector connector : Bootstrap.virtualMachineManager().launchingConnectors()) {
             if (connector.name().equals("com.sun.jdi.CommandLineLaunch")) {
