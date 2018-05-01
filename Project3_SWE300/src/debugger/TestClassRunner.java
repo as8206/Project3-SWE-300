@@ -41,16 +41,11 @@ public class TestClassRunner {
 				.setOptions("-cp " + cp).setMain(main);
 		
 		vm = launcher.launch();
-		
-		
 		EventRequestManager mgr = vm.eventRequestManager();
-		MethodExitRequest exitRequest = mgr.createMethodExitRequest();
-		exitRequest.addClassFilter("rangeClasses.MyJunit");
 		
 		ClassPrepareRequest cpreq = mgr.createClassPrepareRequest();
 		cpreq.enable();
 		
-		exitRequest.enable();
 		EventQueue queue = vm.eventQueue();
 		
 		while(true)
@@ -59,10 +54,6 @@ public class TestClassRunner {
 			
 			for (Event e : set)
 			{
-				if (e instanceof ModificationWatchpointEvent)
-				{
-					variableModifcationFlag = true;
-				}
 				if (prepped == false && e instanceof ClassPrepareEvent) 
 				{
 					ClassPrepareEvent cpe = (ClassPrepareEvent) e;
@@ -78,11 +69,21 @@ public class TestClassRunner {
 						ModificationWatchpointRequest modRequestEnd = 
 								mgr.createModificationWatchpointRequest(testEnd);
 						
+						MethodExitRequest exitRequest = mgr.createMethodExitRequest();
+						exitRequest.addClassFilter("rangeClasses.MyJunit");
+						
 						modRequestStart.enable();
 						modRequestEnd.enable();	
+						exitRequest.enable();
 						prepped = true;
 					}
 				}
+				
+				if (e instanceof ModificationWatchpointEvent)
+				{
+					variableModifcationFlag = true;
+				}
+				
 				if (variableModifcationFlag==true &&  e instanceof MethodExitEvent)
 				{
 					if (((MethodExitEvent)e).method().name().startsWith("test"))
