@@ -95,7 +95,13 @@ public class TestClassRunner {
 			set.resume();
 		}
 	}
-
+/** 
+ * Resets the testStart and testEnd back to their original values for further testing
+ * @param e : the method exit event
+ * @throws InvalidTypeException
+ * @throws ClassNotLoadedException
+ * @throws IncompatibleThreadStateException
+ */
 	private static void process(MethodExitEvent e) throws InvalidTypeException, ClassNotLoadedException, IncompatibleThreadStateException
 	{
 		ObjectReference obj = e.thread().frame(0).thisObject();
