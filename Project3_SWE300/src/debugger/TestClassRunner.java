@@ -43,6 +43,9 @@ public class TestClassRunner {
 		vm = launcher.launch();
 		EventRequestManager mgr = vm.eventRequestManager();
 		
+		/*
+		 * Creates the initial class prepare request that will create all other event requests
+		 */
 		ClassPrepareRequest cpreq = mgr.createClassPrepareRequest();
 		cpreq.enable();
 		
@@ -52,8 +55,16 @@ public class TestClassRunner {
 		{
 			EventSet set = queue.remove();
 			
+			/**
+			 * Runs through the event queue and evaluates each event
+			 */
 			for (Event e : set)
 			{
+				/**
+				 * Waits for a class prepare event, as long as this hasn't happened already
+				 * If this prepare event is the "MyJunit" class, gets the reference type and field information.
+				 * Creates the modification watchpoint request and the method exit request and enables them.
+				 */
 				if (prepped == false && e instanceof ClassPrepareEvent) 
 				{
 					ClassPrepareEvent cpe = (ClassPrepareEvent) e;
@@ -79,11 +90,19 @@ public class TestClassRunner {
 					}
 				}
 				
+				/**
+				 * If either of the initial variables are modified, this will set a flag to true
+				 * This occurs while the original runner is still in the method that changed the variable
+				 */
 				if (e instanceof ModificationWatchpointEvent)
 				{
 					variableModifcationFlag = true;
 				}
 				
+				/**
+				 * Once the method exits, and a variable has been modified, this will check if it is
+				 * a test method and call the process method to reset the variables.
+				 */
 				if (variableModifcationFlag==true &&  e instanceof MethodExitEvent)
 				{
 					if (((MethodExitEvent)e).method().name().startsWith("test"))
@@ -96,7 +115,13 @@ public class TestClassRunner {
 			set.resume();
 		}
 	}
-
+/** 
+ * Resets the testStart and testEnd back to their original values for further testing
+ * @param e : the method exit event
+ * @throws InvalidTypeException
+ * @throws ClassNotLoadedException
+ * @throws IncompatibleThreadStateException
+ */
 	private static void process(MethodExitEvent e) throws InvalidTypeException, ClassNotLoadedException, IncompatibleThreadStateException
 	{
 		ObjectReference obj = e.thread().frame(0).thisObject();
