@@ -33,6 +33,7 @@ public class TestClassRunner {
 	public static void main(String[] args) throws VMStartException, IllegalConnectorArgumentsException, IOException, InterruptedException, InvalidTypeException, ClassNotLoadedException, IncompatibleThreadStateException {
 		final String cp = "/home/andrew/git/Project3-SWE-300/Project3_SWE300/bin/";
 		final String main = "rangeClasses.MyJunit";
+		
 		boolean variableModifcationFlag = false;
 		boolean prepped = false;
 		
@@ -46,14 +47,9 @@ public class TestClassRunner {
 		MethodExitRequest exitRequest = mgr.createMethodExitRequest();
 		exitRequest.addClassFilter("rangeClasses.MyJunit");
 		
-		
 		ClassPrepareRequest cpreq = mgr.createClassPrepareRequest();
 		cpreq.enable();
 		
-		
-//		ModificationWatchpointRequest modRequest = 
-//				mgr.createModificationWatchpointRequest("testStart");
-
 		exitRequest.enable();
 		EventQueue queue = vm.eventQueue();
 		
@@ -71,16 +67,17 @@ public class TestClassRunner {
 				{
 					ClassPrepareEvent cpe = (ClassPrepareEvent) e;
 					ref = cpe.referenceType();
+					
 					if (ref.name().contains("MyJunit"))
 					{						
 						testStart = ref.fieldByName("testStart");
 						testEnd = ref.fieldByName("testEnd");
-//						ClassPrepareEvent objectEvent = (ClassPrepareEvent) e;
-//						obj = objectEvent.thread().frame(0).thisObject();
+						
 						ModificationWatchpointRequest modRequestStart = 
 								mgr.createModificationWatchpointRequest(testStart);
 						ModificationWatchpointRequest modRequestEnd = 
 								mgr.createModificationWatchpointRequest(testEnd);
+						
 						modRequestStart.enable();
 						modRequestEnd.enable();	
 						prepped = true;
@@ -99,11 +96,13 @@ public class TestClassRunner {
 		}
 	}
 
-	private static void process(MethodExitEvent e) throws InvalidTypeException, ClassNotLoadedException, IncompatibleThreadStateException{
-//		System.out.println("Exiting " + e.method());
+	private static void process(MethodExitEvent e) throws InvalidTypeException, ClassNotLoadedException, IncompatibleThreadStateException
+	{
 		ObjectReference obj = e.thread().frame(0).thisObject();
+		
 		IntegerValue startInt = vm.mirrorOf(100);
 		IntegerValue endInt = vm.mirrorOf(200);
+		
 		obj.setValue(testStart, startInt);
 		obj.setValue(testEnd, endInt);
 	}
